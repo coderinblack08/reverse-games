@@ -1,19 +1,28 @@
-import { Container, Heading } from "@chakra-ui/layout";
-import { Button } from "@chakra-ui/react";
+import { Container, Heading, Text } from "@chakra-ui/layout";
+import { Button, HStack, Image } from "@chakra-ui/react";
 import Link from "next/link";
 
 export default function Home() {
   return (
     <Container py={8} px={2}>
-      <Heading>Upside-Down Games</Heading>
-      <Link href="/wordle">
-        <Button mt={4} w="full" colorScheme="green" as="a">
+      <Heading color="gray.800">
+        Upside-Down <br /> <Text color="gray.500">Game Studio</Text>
+      </Heading>
+      <HStack spacing={4} mt={8}>
+        <Button
+          w="full"
+          as={Link}
+          size="lg"
+          href="/wordle"
+          colorScheme="green"
+          leftIcon={<Image src="/wordle.png" boxSize={8} />}
+        >
           Wordle
         </Button>
-      </Link>
-      <Button mt={4} w="full" colorScheme="blue">
-        Sudoku
-      </Button>
+        <Button w="full" colorScheme="blue" size="lg" isDisabled>
+          Sudoku
+        </Button>
+      </HStack>
     </Container>
   );
 }

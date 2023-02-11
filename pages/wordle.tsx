@@ -1,57 +1,104 @@
 import {
   Box,
-  Container,
   Flex,
   Heading,
   HStack,
-  SimpleGrid,
+  Kbd,
+  Text,
   VStack,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   generateGuess,
   generateWord,
   rateGuess,
   Rating,
 } from "../generate-word";
+import { isWord } from "../is-word";
 
 const WordleRow: React.FC<{
   guess?: string;
+  answer?: string;
   rating: Rating;
   interactive?: boolean;
-}> = ({ guess, rating, interactive = false }) => {
+}> = ({ guess, answer, rating, interactive = false }) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const [solved, setSolved] = useState(false);
+  const [typed, setTyped] = useState("");
+
   return (
-    <HStack
-      as="button"
-      _focus={{
-        // boxshadow with 2px offset
-        boxShadow: "0 0 0 3px #3182ce",
-      }}
-      spacing={1.5}
-    >
-      {new Array(5).fill(null).map((_, i) => (
-        <Flex
-          key={i}
-          boxSize="52px"
-          alignItems="center"
-          justifyContent="center"
-          fontWeight="bold"
-          fontSize="32px"
-          lineHeight={1}
-          textTransform="uppercase"
-          color={interactive ? "gray.800" : "white"}
-          backgroundColor={
-            rating.correct[i]
-              ? "#6aaa64"
-              : rating.misplaced[i]
-              ? "#c9b458"
-              : "#787c7e"
+    <HStack spacing={1.5}>
+      <HStack
+        onKeyDown={async (e) => {
+          if (e.key === "Enter") {
+            const checkRow = async () => {
+              if (!(await isWord(typed))) {
+                alert("Not a real word");
+                return false;
+              }
+              if (typed.length === 5 && answer) {
+                const typedRating = rateGuess(answer, typed);
+                for (let i = 0; i < 5; i++) {
+                  if (typedRating.correct[i] !== rating.correct[i]) {
+                    return false;
+                  }
+                  if (typedRating.misplaced[i] !== rating.misplaced[i]) {
+                    return false;
+                  }
+                }
+                return true;
+              } else {
+                return false;
+              }
+            };
+
+            if (await checkRow()) setSolved(true);
+            // setIsFocused(false);
+          } else if (e.key === "Backspace") {
+            setTyped(typed.slice(0, -1));
+          } else if (
+            e.key.length === 1 &&
+            e.key.match(/[a-z]/i) &&
+            typed.length < 5
+          ) {
+            setTyped(typed + e.key);
           }
-        >
-          {guess && guess.at(i)}
-        </Flex>
-      ))}
+        }}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        as="button"
+        _focus={{
+          outlineOffset: "2px",
+          outline: "3px solid",
+          outlineColor: "gray.400",
+        }}
+        spacing={1.5}
+      >
+        {new Array(5).fill(null).map((_, i) => (
+          <Flex
+            key={i}
+            boxSize="52px"
+            alignItems="center"
+            justifyContent="center"
+            fontWeight="bold"
+            fontSize="32px"
+            lineHeight={1}
+            textTransform="uppercase"
+            color="white"
+            backgroundColor={
+              rating.correct[i]
+                ? "#6aaa64"
+                : rating.misplaced[i]
+                ? "#c9b458"
+                : "#787c7e"
+            }
+          >
+            {interactive ? typed?.at(i) : guess?.at(i)}
+          </Flex>
+        ))}
+      </HStack>
+      <Box opacity={interactive ? 1 : 0}>{solved ? "✅" : "❌"}</Box>
     </HStack>
   );
 };
@@ -59,25 +106,6 @@ const WordleRow: React.FC<{
 const WordlePage: NextPage = () => {
   const [word, setWord] = useState("");
   const [ratings, setRatings] = useState<Rating[]>([]);
-  const [guess, setGuess] = useState("");
-
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent) => {
-      console.log(event.key);
-      if (event.key === "Backspace") {
-        setGuess(guess.slice(0, -1));
-      } else if (event.key === "Enter") {
-        setGuess("");
-      } else if (
-        event.key.length === 1 &&
-        event.key.match(/[a-z]/i) &&
-        guess.length < 5
-      ) {
-        setGuess(guess + event.key);
-      }
-    },
-    [guess]
-  );
 
   useEffect(() => {
     generateWord().then((w) => setWord(w!));
@@ -87,23 +115,21 @@ const WordlePage: NextPage = () => {
     generateGuess(word).then(setRatings);
   }, [word]);
 
-  useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleKeyDown]);
-
   return (
     <Box minH="100vh">
-      <Box py={3} borderBottom="2px solid" borderColor="gray.300">
+      <Box pt={4}>
         <Heading textAlign="center" size="lg">
           Reverse Wordle
         </Heading>
       </Box>
       <VStack p={4} justifyContent="center" spacing={1.5}>
         {ratings.map((rating, i) => (
-          <WordleRow key={i} rating={rating} interactive />
+          <WordleRow key={i} answer={word} rating={rating} interactive />
         ))}
         <WordleRow guess={word} rating={rateGuess(word, word)} />
+        <Text fontSize="sm">
+          Press <Kbd>↩</Kbd> to check each row
+        </Text>
       </VStack>
     </Box>
   );
