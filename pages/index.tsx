@@ -4,11 +4,11 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <Container py={8} px={2}>
+    <Container py={16}>
       <Heading color="gray.800">
         Upside-Down <br /> <Text color="gray.500">Game Studio</Text>
       </Heading>
-      <HStack spacing={4} mt={8}>
+      <HStack spacing={4} mt={8} w="full">
         <Button
           w="full"
           as={Link}
