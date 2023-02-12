@@ -1,5 +1,5 @@
 import { Container, Heading, Text } from "@chakra-ui/layout";
-import { Button, HStack, Image } from "@chakra-ui/react";
+import { Button, HStack, Image, Tooltip } from "@chakra-ui/react";
 import Link from "next/link";
 
 export default function Home() {
@@ -9,16 +9,22 @@ export default function Home() {
         Upside-Down <br /> <Text color="gray.500">Game Studio</Text>
       </Heading>
       <HStack spacing={4} mt={8} w="full">
-        <Button
-          w="full"
-          as={Link}
-          size="lg"
-          href="/wordle"
-          colorScheme="green"
-          leftIcon={<Image src="/wordle.png" boxSize={8} />}
+        <Tooltip
+          label="Normal wordle, but with instead of finding the final word, find the intermediate guesses."
+          hasArrow
         >
-          Wordle
-        </Button>
+          <Button
+            w="full"
+            as={Link}
+            size="lg"
+            href="/wordle"
+            colorScheme="green"
+            leftIcon={<Image src="/wordle.png" boxSize={8} />}
+          >
+            Wordle
+          </Button>
+        </Tooltip>
+
         <Button w="full" colorScheme="blue" size="lg" isDisabled>
           Sudoku
         </Button>

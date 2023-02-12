@@ -8,7 +8,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   generateGuess,
   generateWord,
@@ -62,7 +62,7 @@ const WordleRow: React.FC<{
             e.key.match(/[a-z]/i) &&
             typed.length < 5
           ) {
-            setTyped(typed + e.key);
+            setTyped(typed + e.key.toLocaleLowerCase());
           }
         }}
         onFocus={() => setIsFocused(true)}
