@@ -7,7 +7,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { create } from "zustand";
 import { shallow } from "zustand/shallow";
 
@@ -118,8 +118,12 @@ const Connect4Column = ({ col }: any) => {
 
   function animate() {
     ref.current?.animate(
-      [{ transform: "rotateX(0deg)" }, { transform: "rotateX(180deg)" }],
-      { duration: 500, iterations: 1, easing: "ease-in-out" }
+      [
+        { transform: "rotateX(0deg)" },
+        { transform: "rotateX(180deg)" },
+        { transform: "rotateX(0deg)" },
+      ],
+      { duration: 1000, iterations: 1, easing: "ease-in-out" }
     );
   }
 
@@ -140,7 +144,9 @@ const Connect4Column = ({ col }: any) => {
             if (board[row][col] !== null) return;
             simulateTurn(row, col);
             animate();
-            setTimeout(() => flipColumn(col), 500);
+            setTimeout(() => {
+              flipColumn(col);
+            }, 500);
           }}
           cursor="pointer"
           backgroundColor={
