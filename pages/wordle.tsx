@@ -5,6 +5,7 @@ import {
   HStack,
   Kbd,
   Text,
+  useToast,
   VStack,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
@@ -26,6 +27,7 @@ const WordleRow: React.FC<{
   const [isFocused, setIsFocused] = useState(false);
   const [solved, setSolved] = useState(false);
   const [typed, setTyped] = useState("");
+  const toast = useToast();
 
   return (
     <HStack spacing={1.5}>
@@ -34,7 +36,7 @@ const WordleRow: React.FC<{
           if (e.key === "Enter") {
             const checkRow = async () => {
               if (!(await isWord(typed))) {
-                alert("Not a real word");
+                toast({ title: "Not a real word", status: "error" });
                 return false;
               }
               if (typed.length === 5 && answer) {
@@ -53,7 +55,10 @@ const WordleRow: React.FC<{
               }
             };
 
-            if (await checkRow()) setSolved(true);
+            if (await checkRow()) {
+              toast({ title: "Correct!", status: "success" });
+              setSolved(true);
+            }
             // setIsFocused(false);
           } else if (e.key === "Backspace") {
             setTyped(typed.slice(0, -1));

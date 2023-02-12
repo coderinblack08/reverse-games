@@ -24,9 +24,14 @@ export default function Home() {
             Wordle
           </Button>
         </Tooltip>
-
-        <Button w="full" colorScheme="blue" size="lg" isDisabled>
-          Sudoku
+        <Button
+          w="full"
+          colorScheme="blue"
+          size="lg"
+          as={Link}
+          href="/connect4"
+        >
+          Connect 4
         </Button>
       </HStack>
     </Container>
